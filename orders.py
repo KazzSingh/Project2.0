@@ -1,7 +1,7 @@
 import config as cnfg
 
-order_menu = ["Return to Main Menu", "Order List", "Create New Order!", "Update Order Status",
-              "Update Existing Order!", "Delete Order"]
+order_menu = ["Return to Main Menu", "Order List", "Create New Order", "Update Order Status",
+              "Update Existing Order", "Delete Order"]
 
 order_list = []
 
