@@ -1,7 +1,7 @@
 import config as cnfg
 
-courier_menu = ["Return to Main Menu", "Courier List", "Create new Courier!",
-                "Update existing Courier!", "Delete Courier"]
+courier_menu = ["Return to Main Menu", "Courier List", "Create new Courier",
+                "Update existing Courier", "Delete Courier"]
 
 courier_list = []
 
