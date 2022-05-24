@@ -3,7 +3,7 @@ import sql_read_write as sql
 import pprint
 
 
-def _get_courier_request():
+def get_courier_request():
     print()
     print("Courier menu options:")
     print("  0: Return to main menu")
@@ -16,44 +16,56 @@ def _get_courier_request():
     return courier_request
 
 
-def _create_new_courier(couriers):
-    courier = {}
-    courier['courier_name'] = c_name = input("Courier name: ")
-    courier['courier_phone'] = c_phone = input("Courier phone: ")
-    couriers.append(courier)
+def create_new_courier():
+    c_name = input("Courier name: ")
+    c_phone = input("Courier phone: ")
     sql.insert_new_courier((c_name, c_phone))
-    return couriers
+
+#########################################################
 
 
-def _update_existing_courier(couriers):
-    print_with_index(couriers)
-    courier_index = int(input("Courier index: "))
-    courier_name = input("Courier name: ")
-    couriers[courier_index] = courier_name
-    return couriers
+def update_existing_courier():
+    couriers = sql.print_couriers()
+
+    courier_index = int(
+        input("INDEX of the courier you would like to update: "))
+
+    courier_name = input(
+        "Hit [Enter] to skip, or provide new courier name: ")
+    if courier_name == '':
+        courier_name = couriers[courier_index]['courier_name']
+
+    courier_phone = input(
+        "Hit [Enter] to skip, or provide new phone number: ")
+    if courier_phone == '':
+        courier_phone = couriers[courier_index]['courier_phone']
+
+    courier_id = couriers[courier_index]['courier_id']
+    values = courier_name, courier_phone, courier_id
+    sql.update_courier_rec(values)
+#########################################################
 
 
-def _delete_existing_courier(couriers):
-    print_with_index(couriers)
-    courier_index = int(input("Courier index: "))
-    couriers.pop(courier_index)
-    return couriers
+def delete_existing_courier():
+    couriers = sql.print_couriers()
+    courier_index = input(
+        "\nEnter the INDEX of the courier you would like to delete: ")
+    sql.delete_courier_rec(couriers[int(courier_index)]['courier_id'])
 
 
-def courier_menu(couriers):
+def courier_menu():
     courier_request = None
     while courier_request != "0":
-        courier_request = _get_courier_request()
+        courier_request = get_courier_request()
         if courier_request == "0":
-            return couriers
+            return
         elif courier_request == "1":
-            for courier in couriers:
-                print(list(courier.values())[:2])
+            sql.print_couriers()
         elif courier_request == "2":
-            couriers = _create_new_courier(couriers)
+            create_new_courier()
         elif courier_request == "3":
-            couriers = _update_existing_courier(couriers)
+            update_existing_courier()
         elif courier_request == "4":
-            couriers = _delete_existing_courier(couriers)
+            delete_existing_courier()
         else:
             print("Invalid option")

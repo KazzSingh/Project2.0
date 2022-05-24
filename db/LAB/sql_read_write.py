@@ -20,8 +20,6 @@ connection = pymysql.connect(
     database
 )
 
-products, couriers, orders, order_status_options = rw.load_data()
-
 ##################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################
 
@@ -59,7 +57,7 @@ def insert_new_courier(values):
     # Execute SQL query
     cursor.execute(insert, values)
     connection.commit()
-    print("done")
+    print("Success")
     cursor.close()
 #     connection.close()
 
@@ -77,7 +75,7 @@ def insert_new_customer(values):
     cursor.execute(insert, values)
     connection.commit()
     cust_id = cursor.lastrowid
-    print("done")
+    print("Success")
     cursor.close()
     return cust_id
     # connection.close()
@@ -89,13 +87,16 @@ def insert_new_customer(values):
 
 
 def insert_new_order(values):
+    print(values)
     cursor = connection.cursor()
-    insert = ("INSERT INTO order (cust_id, courier_id) VALUES (%s, %s)")
+    cust_id, courier_id, basket, order_status = values
+    insert = (
+        "INSERT INTO orders (cust_id, courier_id, basket, order_status) VALUES (%s,%s,%s,%s)")
     # Execute SQL query
     cursor.execute(insert, values)
     connection.commit()
     order_id = cursor.lastrowid
-    print("done")
+    print("Success")
     cursor.close()
     return order_id
 #     connection.close()
@@ -115,14 +116,15 @@ def insert_new_order(values):
 ################################################################################################################
 
 
-# def insert_new_product(values):
-#     cursor = connection.cursor()
-#     insert = ("INSERT INTO products (product_name, price) VALUES (%s, %s)")
-#     # Execute SQL query
-#     cursor.execute(insert, values)
-#     connection.commit()
-#     print("done")
-#     cursor.close()
+def update_product_rec(values):
+    cursor = connection.cursor()
+    insert = (
+        "UPDATE products SET product_name = (%s), price = (%s)  WHERE product_id = (%s)")
+    # Execute SQL query
+    cursor.execute(insert, values)
+    connection.commit()
+    print("Updated Successfully")
+    cursor.close()
 
 
 # # ################################################################################################################
@@ -130,14 +132,15 @@ def insert_new_order(values):
 # # ################################################################################################################
 
 
-# def insert_new_courier(values):
-#     cursor = connection.cursor()
-#     insert = ("INSERT INTO couriers (courier_name, courier_phone) VALUES (%s, %s)")
-#     # Execute SQL query
-#     cursor.execute(insert, values)
-#     connection.commit()
-#     print("done")
-#     cursor.close()
+def update_courier_rec(values):
+    cursor = connection.cursor()
+    insert = (
+        "UPDATE couriers SET courier_name = (%s), courier_phone = (%s)  WHERE courier_id = (%s)")
+    # Execute SQL query
+    cursor.execute(insert, values)
+    connection.commit()
+    print("Updated Successfully")
+    cursor.close()
 
 
 # # ################################################################################################################
@@ -145,16 +148,15 @@ def insert_new_order(values):
 # # ################################################################################################################
 
 
-# # #
-# def insert_new_customer(values):
-#     cursor = connection.cursor()
-#     insert = ("INSERT INTO customers (f_name, l_name, first_line_of_address, postcode, cust_phone) VALUES (%s, %s)")
-#     cursor.execute(insert, values)
-#     connection.commit()
-#     print("done")
-#     cust_id = cursor.lastrowid
-#     cursor.close()
-#     return cust_id
+def update_customer_rec(values):
+    cursor = connection.cursor()
+    insert = (
+        "UPDATE customers SET f_name = (%s), l_name = (%s), first_line_of_address = (%s), postcode = (%s), cust_phone = (%s) WHERE cust_id = (%s)")
+    # Execute SQL query
+    cursor.execute(insert, values)
+    connection.commit()
+    print("Updated Successfully")
+    cursor.close()
 
 
 # # ################################################################################################################
@@ -162,27 +164,117 @@ def insert_new_order(values):
 # # ################################################################################################################
 
 
-# def insert_new_courier(values):
-#     cursor = connection.cursor()
-#     insert = ("INSERT INTO couriers (courier_name, courier_phone) VALUES (%s, %s)")
-#     # Execute SQL query
-#     cursor.execute(insert, values)
-#     connection.commit()
-#     print("done")
-#     cursor.close()
+def update_order_rec(values):
+    cursor = connection.cursor()
+    insert = (
+        "UPDATE orders SET courier_id = (%s), basket = (%s)  WHERE order_id = (%s)")
+    # Execute SQL query
+    cursor.execute(insert, values)
+    connection.commit()
+    print("Updated Successfully")
+    cursor.close()
 
 
+# # ################################################################################################################
+# # # UPDATE existing ORDER STATUS INTO table
+# # ################################################################################################################
+
+
+def update_order_status_rec(values):
+    cursor = connection.cursor()
+    insert = (
+        "UPDATE orders SET order_status = (%s)  WHERE order_id = (%s)")
+    # Execute SQL query
+    cursor.execute(insert, values)
+    connection.commit()
+    print("Updated Successfully")
+    cursor.close()
 ##################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################
 
-# RETRIEVE INFO
-# INSERT WHOLE LIST
-# CREATE TABLE
+# DELETIONINGS
 
 ##################################################################################################################################################################################################################################
 ###################################################################################################################################################################################################################################
 
-def _load_products():
+
+################################################################################################################
+# DELETE EXISTING product FROM table
+################################################################################################################
+
+
+def delete_product_rec(values):
+    cursor = connection.cursor()
+    insert = ("DELETE FROM products WHERE product_id=(%s)")
+    # Execute SQL query
+    cursor.execute(insert, values)
+    connection.commit()
+    print("\n Record deleted \n")
+    cursor.close()
+
+
+# # ################################################################################################################
+# # # DELETE EXISTING courier INTO table
+# # ################################################################################################################
+
+
+def delete_courier_rec(values):
+    cursor = connection.cursor()
+    insert = (
+        "DELETE FROM couriers WHERE courier_id = (%s)")
+    # Execute SQL query
+    try:
+        cursor.execute(insert, values)
+        print("\n Record deleted \n")
+    except pymysql.err.IntegrityError:
+        print("\nCourier has active orders to complete. Please reallocate the order from the orders before trying again.")
+    connection.commit()
+    cursor.close()
+
+
+# # ################################################################################################################
+# # # DELETE EXISTING customer FROM table
+# # ################################################################################################################
+
+
+def delete_customer_rec(values):
+    cursor = connection.cursor()
+    insert = (
+        "DELETE FROM customers WHERE cust_id = (%s)")
+    # Execute SQL query
+    cursor.execute(insert, values)
+    connection.commit()
+    print("\n Record deleted \n")
+    cursor.close()
+
+
+# # ################################################################################################################
+# # # DELETE EXISTING order FROM table
+# # ################################################################################################################
+
+
+def delete_order_rec(values):
+    cursor = connection.cursor()
+    insert = (
+        "DELETE FROM orders WHERE order_id = (%s)")
+    # Execute SQL query
+    cursor.execute(insert, values)
+    connection.commit()
+    print("\n Record deleted \n")
+    cursor.close()
+
+
+##################################################################################################################################################################################################################################
+##################################################################################################################################################################################################################################
+
+# RETRIEVE DATA IN DICT FORM
+# PRINT DICTS
+# PRINT SPECIFIC RECORDS
+
+##################################################################################################################################################################################################################################
+###################################################################################################################################################################################################################################
+
+def print_products():
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM products")
     fieldnames = ['product_id', 'product_name', 'price']
@@ -193,24 +285,90 @@ def _load_products():
         products.append(dict(zip(fieldnames, row)))
     cursor.close()
     # connection.close() DO NOT CLOSE THE CONNECTION
-
+    print("{:<8} {:<15} {:<15} {:<20}".format(
+        'Index', 'product_id', 'product_name', 'price'))
+    for i, product in enumerate(products):
+        product_id, name, price = product.values()
+        print("{:<8} {:<15} {:<15} {:<10}".format(i, product_id, name, price))
     return products
 
 
-def _load_couriers():
+def print_couriers():
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM couriers")
-    fieldnames = ['courier_ID', 'courier_name', 'courier_phone']
+    fieldnames = ['courier_id', 'courier_name', 'courier_phone']
     rows = cursor.fetchall()
     couriers = []
     for row in rows:
         couriers.append(dict(zip(fieldnames, row)))
     cursor.close()
     # connection.close() DO NOT CLOSE THE CONNECTION
+    print("{:<8} {:<15} {:<15} {:<20}".format(
+        'Index', 'courier_id', 'courier_name', 'courier_phone'))
+    for i, courier in enumerate(couriers):
+        courier_id, courier_name, courier_phone = courier.values()
+        print("{:<8} {:<15} {:<15} {:<10}".format(
+            i, courier_id, courier_name, courier_phone))
     return couriers
 
 
-def _load_customers():
+def print_specific_courier(courier_id):
+    cursor = connection.cursor()
+    command = ("SELECT * FROM couriers WHERE courier_id=(%s)")
+    cursor.execute(command, courier_id)
+    fieldnames = ['courier_id', 'courier_name', 'courier_phone']
+    rows = cursor.fetchall()
+    couriers = []
+    for row in rows:
+        couriers.append(dict(zip(fieldnames, row)))
+    cursor.close()
+    # connection.close() DO NOT CLOSE THE CONNECTION
+    print("{:<15} {:<15} {:<20}".format(
+        'courier_id', 'courier_name', 'courier_phone'))
+    for courier in couriers:
+        courier_id, courier_name, courier_phone = courier.values()
+        print("{:<15} {:<15} {:<10}".format(
+            courier_id, courier_name, courier_phone))
+    return couriers
+
+
+def print_customers():
+    customers = get_customers_dict()
+    print("\n")
+    print("{:<8} {:<9} {:<9} {:<9} {:<23} {:<10} {:<15}".format(
+        'Index', 'cust_id', 'f_name', 'l_name',
+        'flo_address', 'postcode', 'cust_phone'))
+    for i, customer in enumerate(customers):
+        cust_id, f_name, l_name, flo_address, postcode, cust_phone = customer.values()
+        print("{:<8} {:<9} {:<9} {:<9} {:<23} {:<10} {:<15}".format(i, cust_id, f_name, l_name,
+                                                                    flo_address, postcode, cust_phone))
+    return customers
+
+
+def print_specific_customer(cust_id):
+    cursor = connection.cursor()
+    command = ("SELECT * FROM customers WHERE cust_id=(%s)")
+    cursor.execute(command, cust_id)
+    fieldnames = ['cust_id', 'f_name', 'l_name',
+                  'flo_address', 'postcode', 'cust_phone']
+    rows = cursor.fetchall()
+    customers = []
+    for row in rows:
+        customers.append(dict(zip(fieldnames, row)))
+    cursor.close()
+    # connection.close() DO NOT CLOSE THE CONNECTION
+    print()
+    print("{:<9} {:<9} {:<9} {:<23} {:<10} {:<15}".format(
+        'cust_id', 'f_name', 'l_name',
+        'flo_address', 'postcode', 'cust_phone'))
+    for customer in customers:
+        cust_id, f_name, l_name, flo_address, postcode, cust_phone = customer.values()
+        print("{:<9} {:<9} {:<9} {:<23} {:<10} {:<15}".format(
+            cust_id, f_name, l_name, flo_address, postcode, cust_phone))
+    return customer
+
+
+def get_customers_dict():
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM customers")
     fieldnames = ['cust_id', 'f_name', 'l_name',
@@ -220,82 +378,44 @@ def _load_customers():
     for row in rows:
         customers.append(dict(zip(fieldnames, row)))
     cursor.close()
-    # connection.close() DO NOT CLOSE THE CONNECTION
     return customers
 
 
-def _load_orders():
+def print_orders():
+    orders = get_orders_dict()
+    print("{:<8} {:<10} {:<10} {:<10} {:<20} {:<10}".format(
+        'Index', 'order_id', 'cust_id', 'courier', 'basket', 'status'))
+    for i, order in enumerate(orders):
+        order_id, cust_id, courier, basket, status = order.values()
+        print("{:<8} {:<10} {:<10} {:<10} {:<20} {:<10}".format(
+            i, order_id, cust_id, courier, basket, status))
+    return orders
+
+
+def get_orders_dict():
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM orders")
-    fieldnames = ['order_id', 'cust_id', 'courier', 'status']
+    fieldnames = ['order_id', 'cust_id', 'courier_id', 'basket', 'status']
     rows = cursor.fetchall()
     orders = []
     for row in rows:
         orders.append(dict(zip(fieldnames, row)))
     cursor.close()
-    # connection.close() DO NOT CLOSE THE CONNECTION
-    order_status_options = ["preparing", "sent", "cancelled"]
-    return orders, order_status_options
+    return orders
 
 
-def load_data():
-    products = _load_products()
-    couriers = _load_couriers()
-    customers = _load_customers()
-    orders, order_status_options = _load_orders()
-    return products, couriers, customers, orders, order_status_options
+# def load_data():
+#     products = load_products()
+#     couriers = load_couriers()
+#     customers = load_customers()
+#     orders, order_status_options = load_orders()
+#     return products, couriers, customers, orders, order_status_options
 
 ################################################################################################################
 # RETRIEVE FROM DB
 ################################################################################################################
-# Gets all rows from the result
-# cursor = connection.cursor()
-# cursor.execute("SELECT * FROM customers")
-# fieldnames = ['cust_id', 'f_name', 'l_name',
-#               'flo_address', 'postcode', 'cust_phone']
-# rows = cursor.fetchall()
-# customers = []
-# for row in rows:
-#     customers.append(dict(zip(fieldnames, row)))
-# return customers
-
-# Can alternatively get one result at a time with the below code
-# while True:
-#     row = cursor.fetchone()
-#     if row == None:
-
-#         break
-# #     print(f'First Name: {str(row[0])}, Last Name: {row[1]}, Age: {row[2]}')
-
-
-# # # Closes the cursor so will be unusable from this point
-# cursor.close()
-
-# # # Closes the connection to the DB, make sure you ALWAYS do this
-# connection.close()
 
 ################################################################################################################
-# INSERT whole list INTO table
-################################################################################################################
-# cursor = connection.cursor()
-
-# insert = ("INSERT INTO couriers (courier_name, courier_phone) VALUES (%s, %s)")
-# val = []
-# for courier in couriers:
-#     val.append((courier['courier_name'], courier['courier_phone']))
-#     print((courier['courier_name'], courier['courier_phone']))
-# # Execute SQL query
-# cursor.executemany(insert, val)
-# connection.commit()
-# print("done")
-# # Closes the cursor so will be unusable from this point
-# cursor.close()
-
-# # Closes the connection to the DB, make sure you ALWAYS do this
-# connection.close()
-
-#
-
 
 ################################################################################################################
 # SAVE DATA #
@@ -337,27 +457,6 @@ def save_data(products, couriers, orders):
 #  NOTES - TO DO
 ################################################################################################################
 
-# WE NOW HAVE A PRODUCTS/COURIERS/CUSTOMERS/ORDERS TABLE
+#
 
-
-# CREATING A PRODUCT OR COURIER IS FINE:
-
-# CREATING AN ORDER WILL BE SLIGHTLY DIFFERENT
-############################################## CREATE NEW ORDER #################################################
-# NEW OR EXISTING CUSTOMER?
-#   EXISTING:
-# DO YOU KNOW THE CUSTOMER ID NUMBER? no?
-# ASK FOR THE FIRST NAME, SECOND NAME, and POSTCODE
-# THIS WILL BE CHECKED IN THE DATABASE FOR MATCHES,
-# SHOULD THERE BE ONLY 1 MATCH, THE USER SHALL BE NOTIFIED "RECORD EXISTS" WITH LIST OF MATCHING RECORDS
-# IF NO MATCH FOUND, USER WILL BE NOTIFIED AND APP WILL CONTINUE TO CREATE NEW CUSTOMER, PROMPTED FOR FIRST LINE OF ADDRESS AND PHONE NUMBER
-#   NEW:
-# FIRST NAME, SECOND NAME, FIRST LINE OF ADDRESS, POSTCODE, PHONE NUMBER
-# UPDATE customers TABLE sql
-# RETRIEVE cust_id, STORE IN VARIABLE AND CONTINUE WITH ORDER DETAILS
-# WHAT PRODUCTS WOULD YOU LIKE TO ORDER? (NO QUANTITIES, YET.)
-# WHICH COURIER WOULD YOU LIKE TO CHOOSE? (NOTHING TO DEFFERENCIATE, YET?)
-
-
-# BEFORE WORKING ON CREATING AN ORDER:
-# START WORKING ON 'UPDATING'AND DELETION RECORDS IN THE DATABASE
+########################################################################################################
