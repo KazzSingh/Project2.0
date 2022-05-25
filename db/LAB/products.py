@@ -17,8 +17,10 @@ def get_product_request():
 
 
 def create_new_product():
-    p_name = take.product_name()
-    p_price = take.product_price()
+    p_name = take.name_not_null(
+        input("\nEnter the name of the product you would like to add: "))
+    p_price = take.price(
+        input("Enter the price of the product [£0.00]: £"))
     sql.insert_new_product((p_name, p_price))
 
 #########################################################
@@ -26,20 +28,17 @@ def create_new_product():
 
 def update_existing_product():  # Learn update commands
     products = sql.print_products()
+    product_index = take.valid_index(products, input(
+        "\nEnter the INDEX of the product you would like to update "))
 
-    product_index = int(
-        input("INDEX of the product you would like to update: "))
-
-    product_name = input(
-        "Hit [Enter] to skip, or provide new Product name: ")
+    product_name = take.name(
+        input("Hit [Enter] to skip, or provide new Product name "))
     if product_name == '':
         product_name = products[product_index]['product_name']
 
-    price = input("Hit [Enter] to skip, or provide new Price: £")
+    price = take.price(input("Hit [Enter] to skip, or provide new Price: £"))
     if price == '':
         price = products[product_index]['price']
-    else:
-        price = f'£{price}'
 
     product_id = products[product_index]['product_id']
     values = product_name, price, product_id
@@ -50,7 +49,7 @@ def update_existing_product():  # Learn update commands
 
 def delete_existing_product():
     products = sql.print_products()
-    product_index = input("INDEX of the product you would like to delete: ")
+    product_index = input("\nINDEX of the product you would like to delete: ")
     sql.delete_product_rec(products[int(product_index)]['product_id'])
 
 

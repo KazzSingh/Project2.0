@@ -1,6 +1,7 @@
 from utils import print_with_index
 import sql_read_write as sql
 import customers as cs
+import inputs as take
 
 
 def get_order_request():
@@ -35,7 +36,8 @@ def create_new_order():
     cust_id = cs.new_or_existing_cust()
     print("Available couriers:")     # pick courier by index, return courier ID
     couriers = sql.print_couriers()
-    courier_id = couriers[int(input("Courier INDEX: "))]['courier_id']
+    courier_id = couriers[take.valid_index(
+        couriers, input("Courier INDEX: "))]['courier_id']
     basket = add_items_to_basket()
     order_status = "preparing"     # default order status - upload to order table
     values = cust_id, courier_id, basket, order_status
@@ -47,7 +49,7 @@ def add_items_to_basket():
     basket = []  # pick items for the order and populate a list - will update to take quantity
     products = sql.print_products()
     pick = input(
-        "Please pick an item INDEX to add to basket or any other character to complete order: ")
+        "\nPlease pick an item INDEX to add to basket or any other character to complete order: ")
     while pick.isdigit():
         try:
             basket.append(str(products[int(pick)]['product_id']))
@@ -82,8 +84,8 @@ def update_existing_order():
     while update_order_request != "0":
         update_order_request = get_update_order_request()
         if update_order_request == "0":
-            return ############################################################################################
-        elif update_order_request == "1": #####################################################################
+            return
+        elif update_order_request == "1":
             # update_existing_customer ########################################################################
             customers = sql.get_customers_dict()
             for i, customer in enumerate(customers):
@@ -92,9 +94,8 @@ def update_existing_order():
                     sql.print_specific_customer(customer['cust_id'])
                     cs.update_existing_customer(i)
                     ###########################################################################################
-        elif update_order_request == "2": #####################################################################
+        elif update_order_request == "2":
             # choosing a new courier ######################### ######################## #######################
-            print()
             sql.print_specific_courier(orders[order_index]['courier_id'])
             print("\nPlease select an index from the following couriers:\n ")
             couriers = sql.print_couriers()
@@ -103,14 +104,14 @@ def update_existing_order():
             values = orders[order_index]['courier_id'], orders[order_index]['basket'], orders[order_index]['order_id']
             sql.update_order_rec(values)
             ####################### ######################### ######################## ########################
-        elif update_order_request == "3": #####################################################################
+        elif update_order_request == "3":
             # replacing the basket with new items #############################################################
             print("\nBasket emptied. Please select items from the list below. \n")
             basket = add_items_to_basket()
             values = orders[order_index]['courier_id'], basket, orders[order_index]['order_id']
             sql.update_order_rec(values)
             ###################################################################################################
-        elif update_order_request == "4": #####################################################################
+        elif update_order_request == "4":
             update_existing_order_status(order_index)
         else:
             print("Invalid option")
