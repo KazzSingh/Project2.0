@@ -1,6 +1,7 @@
 from utils import print_with_index
 import sql_read_write as sql
 import pprint
+import inputs as take
 
 
 def get_courier_request():
@@ -17,8 +18,8 @@ def get_courier_request():
 
 
 def create_new_courier():
-    c_name = input("Courier name: ")
-    c_phone = input("Courier phone: ")
+    c_name = take.name_not_null(input("Courier name: "))
+    c_phone = take.phone_number(input("Courier phone: "))
     sql.insert_new_courier((c_name, c_phone))
 
 #########################################################
@@ -27,16 +28,16 @@ def create_new_courier():
 def update_existing_courier():
     couriers = sql.print_couriers()
 
-    courier_index = int(
-        input("INDEX of the courier you would like to update: "))
+    courier_index = take.valid_index(couriers,
+                                     input("\nEnter the INDEX of the courier you would like to update: "))
 
-    courier_name = input(
-        "Hit [Enter] to skip, or provide new courier name: ")
+    courier_name = take.name(input(
+        "Hit [Enter] to skip, or provide new courier name: "))
     if courier_name == '':
         courier_name = couriers[courier_index]['courier_name']
 
-    courier_phone = input(
-        "Hit [Enter] to skip, or provide new phone number: ")
+    courier_phone = take.phone_number(input(
+        "Hit [Enter] to skip, or provide new phone number: "))
     if courier_phone == '':
         courier_phone = couriers[courier_index]['courier_phone']
 
@@ -48,8 +49,8 @@ def update_existing_courier():
 
 def delete_existing_courier():
     couriers = sql.print_couriers()
-    courier_index = input(
-        "\nEnter the INDEX of the courier you would like to delete: ")
+    courier_index = take.valid_index(couriers, input(
+        "\nEnter the INDEX of the courier you would like to delete: "))
     sql.delete_courier_rec(couriers[int(courier_index)]['courier_id'])
 
 

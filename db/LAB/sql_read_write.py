@@ -123,7 +123,7 @@ def update_product_rec(values):
     # Execute SQL query
     cursor.execute(insert, values)
     connection.commit()
-    print("Updated Successfully")
+    print("\nUpdated Successfully")
     cursor.close()
 
 
@@ -139,7 +139,7 @@ def update_courier_rec(values):
     # Execute SQL query
     cursor.execute(insert, values)
     connection.commit()
-    print("Updated Successfully")
+    print("\nUpdated Successfully")
     cursor.close()
 
 
@@ -155,7 +155,7 @@ def update_customer_rec(values):
     # Execute SQL query
     cursor.execute(insert, values)
     connection.commit()
-    print("Updated Successfully")
+    print("\nUpdated Successfully")
     cursor.close()
 
 
@@ -171,7 +171,7 @@ def update_order_rec(values):
     # Execute SQL query
     cursor.execute(insert, values)
     connection.commit()
-    print("Updated Successfully")
+    print("\nUpdated Successfully")
     cursor.close()
 
 
@@ -187,7 +187,7 @@ def update_order_status_rec(values):
     # Execute SQL query
     cursor.execute(insert, values)
     connection.commit()
-    print("Updated Successfully")
+    print("\nUpdated Successfully")
     cursor.close()
 ##################################################################################################################################################################################################################################
 ##################################################################################################################################################################################################################################
@@ -209,7 +209,7 @@ def delete_product_rec(values):
     # Execute SQL query
     cursor.execute(insert, values)
     connection.commit()
-    print("\n Record deleted \n")
+    print("\n Record deleted")
     cursor.close()
 
 
@@ -225,9 +225,9 @@ def delete_courier_rec(values):
     # Execute SQL query
     try:
         cursor.execute(insert, values)
-        print("\n Record deleted \n")
+        print("\n Record deleted")
     except pymysql.err.IntegrityError:
-        print("\nCourier has active orders to complete. Please reallocate the order from the orders before trying again.")
+        print("\n[COULD NOT DELETE]\nCourier has active orders to complete. Please reallocate the order from the orders before trying again.")
     connection.commit()
     cursor.close()
 
@@ -241,10 +241,12 @@ def delete_customer_rec(values):
     cursor = connection.cursor()
     insert = (
         "DELETE FROM customers WHERE cust_id = (%s)")
-    # Execute SQL query
-    cursor.execute(insert, values)
+    try:
+        cursor.execute(insert, values)
+        print("\n Record deleted")
+    except pymysql.err.IntegrityError:
+        print("\n\n[COULD NOT DELETE]\nCustomer has active orders. Please confirm that the order has been cancelled before trying again.")
     connection.commit()
-    print("\n Record deleted \n")
     cursor.close()
 
 
@@ -260,7 +262,7 @@ def delete_order_rec(values):
     # Execute SQL query
     cursor.execute(insert, values)
     connection.commit()
-    print("\n Record deleted \n")
+    print("\n Record deleted")
     cursor.close()
 
 
@@ -285,11 +287,11 @@ def print_products():
         products.append(dict(zip(fieldnames, row)))
     cursor.close()
     # connection.close() DO NOT CLOSE THE CONNECTION
-    print("{:<8} {:<15} {:<15} {:<20}".format(
+    print("{:<8} {:<15} {:<19} {:<20}".format(
         'Index', 'product_id', 'product_name', 'price'))
     for i, product in enumerate(products):
         product_id, name, price = product.values()
-        print("{:<8} {:<15} {:<15} {:<10}".format(i, product_id, name, price))
+        print("{:<8} {:<15} {:<19} {:<10}".format(i, product_id, name, price))
     return products
 
 
@@ -303,11 +305,11 @@ def print_couriers():
         couriers.append(dict(zip(fieldnames, row)))
     cursor.close()
     # connection.close() DO NOT CLOSE THE CONNECTION
-    print("{:<8} {:<15} {:<15} {:<20}".format(
+    print("{:<8} {:<15} {:<19} {:<20}".format(
         'Index', 'courier_id', 'courier_name', 'courier_phone'))
     for i, courier in enumerate(couriers):
         courier_id, courier_name, courier_phone = courier.values()
-        print("{:<8} {:<15} {:<15} {:<10}".format(
+        print("{:<8} {:<15} {:<19} {:<10}".format(
             i, courier_id, courier_name, courier_phone))
     return couriers
 

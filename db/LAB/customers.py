@@ -1,5 +1,6 @@
 from utils import print_with_index
 import sql_read_write as sql
+import inputs as take
 
 
 def get_customer_request():
@@ -16,11 +17,11 @@ def get_customer_request():
 
 
 def create_new_customer():
-    f_name = input("Customer's first name: ")
-    l_name = input("Last name: ")
-    flo_address = input("First line of address: ")
-    postcode = input("Postcode: ")
-    cust_phone = input("Customer phone number: ")
+    f_name = take.name_not_null(input("Customer's first name: "))
+    l_name = take.name_not_null(input("Last name: "))
+    flo_address = take.name_not_null(input("First line of address: "))
+    postcode = take.postcode(input("Postcode: ")).upper()
+    cust_phone = take.phone_number(input("Customer phone number: "))
     values = f_name, l_name, flo_address, postcode, cust_phone
     # inserts into table and returns cust_id
     cust_id = sql.insert_new_customer(values)
@@ -33,28 +34,28 @@ def update_existing_customer(customer_index):  # Learn update commands
     customers = sql.get_customers_dict()
     #    values = f_name, l_name, flo_address, postcode, cust_phone
 
-    f_name = input(
-        "\n[Hit [Enter] to skip] Update first name: ")
+    f_name = take.name(input(
+        "\n[Hit [Enter] to skip] Update first name: "))
     if f_name == '':
         f_name = customers[customer_index]['f_name']
 
-    l_name = input(
-        "[Hit [Enter] to skip] Update last name: ")
+    l_name = take.name(input(
+        "[Hit [Enter] to skip] Update last name: "))
     if l_name == '':
         l_name = customers[customer_index]['l_name']
 
-    flo_address = input(
-        "[Hit [Enter] to skip] Update the first line of address: ")
+    flo_address = take.name(input(
+        "[Hit [Enter] to skip] Update the first line of address: "))
     if flo_address == '':
         flo_address = customers[customer_index]['flo_address']
 
-    postcode = input(
-        "[Hit [Enter] to skip] Update postcode: ")
+    postcode = take.postcode(input(
+        "[Hit [Enter] to skip] Update postcode: "))
     if postcode == '':
         postcode = customers[customer_index]['postcode']
 
-    cust_phone = input(
-        "[Hit [Enter] to skip] Update phone number: ")
+    cust_phone = take.phone_number(input(
+        "[Hit [Enter] to skip] Update phone number: "))
     if cust_phone == '':
         cust_phone = customers[customer_index]['cust_phone']
 
@@ -67,27 +68,26 @@ def update_existing_customer(customer_index):  # Learn update commands
 
 def delete_existing_customer():
     customers = sql.print_customers()
-    customer_index = input(
-        "\n INDEX of the customer you would like to delete: ")
+    customer_index = take.valid_index(customers, input(
+        "\n INDEX of the customer you would like to delete: "))
     sql.delete_customer_rec(customers[int(customer_index)]['cust_id'])
 
 
 def new_or_existing_cust():
-    is_existing = input(
+    new_existing = input(
         "Are you creating an order for a new [0] or existing [1] customer? ")
-    if is_existing == '1':
-        # select from list of customers
-        customers = sql.print_customers()
-        inx = input("customer INDEX: ")
-        cust_id = customers[int(inx)]['cust_id']
-        return cust_id
-
-    elif is_existing == '0':
+    if new_existing == '0':
         # take customer details, create a new customer, retreive cust ID
         cust_id = create_new_customer()
         return cust_id
+    if new_existing == '1':
+        # select from list of customers
+        customers = sql.print_customers()
+        inx = take.valid_index(customers, input("customer INDEX: "))
+        cust_id = customers[int(inx)]['cust_id']
+        return cust_id
     else:
-        print("Invalid selection. \n")
+        print("\nInvalid selection. \n")
         new_or_existing_cust()
 
 
